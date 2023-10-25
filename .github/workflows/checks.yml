@@ -8,6 +8,10 @@ jobs:
     name: Test and Lint
     runs-on: ubuntu-20.04
     steps:
+      - name: Check Secrets Accessibility
+        run: |
+          echo "DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}"
+          echo "DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}"  
       - name: Login to docker Hub
         uses: docker/login-action@v1
         with:
