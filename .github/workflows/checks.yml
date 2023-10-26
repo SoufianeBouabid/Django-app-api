@@ -1,25 +1,32 @@
----
-name: Checks
+name: Docker Build and Tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  test-lint:
-    name: Test and Lint
-    runs-on: ubuntu-20.04
+  build-and-test:
+    name: Build Docker Image and Run Tests
+    runs-on: ubuntu-latest
     steps:
-      - name: Check Secrets Accessibility
-        run: |
-          echo "DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}"
-          echo "DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}"  
-      - name: Login to docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Test
+
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: docker-compose build
+
+      - name: Push Docker Image
+        run: docker-compose push
+
+      - name: Run Tests
         run: docker-compose run --rm app sh -c "python manage.py test"
-      - name: Lint
+
+      - name: Run Linter (Flake8)
         run: docker-compose run --rm app sh -c "flake8"
