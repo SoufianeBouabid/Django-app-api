@@ -13,8 +13,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
+      - name: Debug Docker Login
         run: |
+          echo "DOCKERHUB_USER: $DOCKERHUB_USER"
+          echo "DOCKERHUB_TOKEN: $DOCKERHUB_TOKEN"
+          echo "Running docker login..."
           echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USER --password-stdin
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
