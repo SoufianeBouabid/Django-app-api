@@ -10,12 +10,12 @@ jobs:
     steps:
       - name: Check Secrets Accessibility
         run: |
-          echo "DOCKERHUB_USER: ${{secrets.BOUABIDSOUFIANE}}"
+          echo "DOCKERHUB_USER: ${{secrets.bouabidsoufiane}}"
           echo "DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}"
       - name: Login to docker Hub
         uses: docker/login-action@v1
         with:
-          username: ${{secrets.BOUABIDSOUFIANE}}
+          username: ${{secrets.bouabidsoufiane}}
           password: ${{secrets.DOCKERHUB_TOKEN}}
       - name: Checkout
         uses: actions/checkout@v2
