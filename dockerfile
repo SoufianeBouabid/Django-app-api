@@ -18,7 +18,7 @@ ENV PIP_NO_CACHE_DIR=off
 # Copy project requirements and application code into the container
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
-COPY ./app /app
+COPY ./app /app_code
 
 # Set the working directory to the application directory
 WORKDIR /app
