@@ -12,18 +12,16 @@ RUN apk update && \
 # Define an environment variable to disable SSL verification (for the duration of the image build)
 ENV PIP_NO_CACHE_DIR=off
 
-# Copy project requirements and application code into the container
+# Copy project requirements into the container
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
-COPY ./app /app_code
 
 # Set the working directory to the application directory
 WORKDIR /app
 
-# Create the user 'django-user' and directory '/py' for ownership change
+# Create the user 'django-user' and the '/py' directory for the ownership change
 RUN adduser --disabled-password --no-create-home django-user && \
-    mkdir /py && chown -R django-user /py && \
-    chown -R django-user /app_code
+    mkdir /py && chown -R django-user /py
 
 # Switch to the 'django-user' to perform further operations
 USER django-user
@@ -34,8 +32,8 @@ RUN python -m venv /py && \
     /py/bin/pip install -r /tmp/requirements.txt --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org && \
     /py/bin/pip install flake8
 
-# Start the project inside the container using the 'django-admin' command
-RUN mkdir /app/app && /py/bin/django-admin startproject app /app/app
+# Create the Django project inside the container
+RUN /py/bin/django-admin startproject app .
 
 # Clean up temporary files
 RUN rm -rf /tmp
