@@ -30,13 +30,13 @@ EXPOSE 8000
 ARG DEV=false
 
 # Create a virtual environment and install Python packages with trusted hosts
-RUN set -ex \
-    && if [ ! -d "/app" ]; then \
+RUN set -ex && \
+    if [ ! -d "/app" ]; then \
     python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r /tmp/requirements.txt --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org && \
     /py/bin/pip install flake8 && \
-    /py/bin/django-admin startproject app .;\
+    /py/bin/django-admin startproject app .; \
     fi
 
 # Add /py/bin and /usr/local/bin to the PATH environment variable
@@ -57,4 +57,3 @@ ENV PATH="/py/bin:$PATH"
 
 # Switch to the non-root user
 USER django-user
-
