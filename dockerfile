@@ -31,26 +31,22 @@ ARG DEV=false
 
 # Create a virtual environment and install Python packages with trusted hosts
 RUN set -ex && \
-    if [ ! -d "/app" ]; then \
     python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r /tmp/requirements.txt --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org && \
     /py/bin/pip install flake8 && \
-    /py/bin/django-admin startproject app .; \
-    fi
+    /py/bin/django-admin startproject app .
 
 # Add /py/bin and /usr/local/bin to the PATH environment variable
 RUN echo 'export PATH="/py/bin:$PATH:/usr/local/bin"' >> /etc/profile
 
 # Conditionally install development requirements
-RUN if [ "$DEV" = "true" ]; then pip install -r /tmp/requirements.dev.txt; fi
+RUN if [ "$DEV" = "true" ]; then /py/bin/pip install -r /tmp/requirements.dev.txt; fi
 
 # Clean up temporary files and create a non-root user
 RUN rm -rf /tmp && \
-    adduser \
-    --disabled-password \
-    --no-create-home \
-    django-user
+    adduser --disabled-password --no-create-home django-user && \
+    chown -R django-user /app
 
 # Set the PATH to include the virtual environment
 ENV PATH="/py/bin:$PATH"
