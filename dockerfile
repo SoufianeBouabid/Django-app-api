@@ -12,19 +12,25 @@ RUN apk update && \
     apk add --no-cache openssl ca-certificates && \
     update-ca-certificates
 
+# Create a non-root user before copying files
+RUN adduser --disabled-password --no-create-home django-user
+
+# Create application directory and change the ownership
+RUN mkdir /app && chown -R django-user /app
+
+# Switch to the non-root user
+USER django-user
+
 # Define an environment variable to disable SSL verification (for the duration of the image build)
 ENV PIP_NO_CACHE_DIR=off
 
 # Copy project requirements and application code into the container
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
-COPY ./app /app_code
+COPY ./app /app
 
 # Set the working directory to the application directory
 WORKDIR /app
-
-# Change the owner of the copied files
-RUN chown -R django-user /app
 
 # Expose port 8000 (adjust as needed)
 EXPOSE 8000
@@ -46,13 +52,5 @@ RUN echo 'export PATH="/py/bin:$PATH:/usr/local/bin"' >> /etc/profile
 # Conditionally install development requirements
 RUN if [ "$DEV" = "true" ]; then /py/bin/pip install -r /tmp/requirements.dev.txt; fi
 
-# Clean up temporary files and create a non-root user
-RUN rm -rf /tmp && \
-    adduser --disabled-password --no-create-home django-user && \
-    chown -R django-user /app
-
-# Set the PATH to include the virtual environment
-ENV PATH="/py/bin:$PATH"
-
-# Switch to the non-root user
-USER django-user
+# Clean up temporary files
+RUN rm -rf /tmp
