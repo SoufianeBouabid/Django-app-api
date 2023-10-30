@@ -4,8 +4,6 @@ FROM python:3.9-alpine3.13
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
 
-
-
 # Install necessary packages, including CA certificates
 RUN apk update && \
     apk add --no-cache openssl ca-certificates && \
@@ -24,10 +22,8 @@ WORKDIR /app
 
 # Create the user 'django-user' and directory '/py' for ownership change
 RUN adduser --disabled-password --no-create-home django-user && \
-    mkdir /py && chown -R django-user /py
-
-# Change the ownership of the copied files
-RUN chown -R django-user /app_code
+    mkdir /py && chown -R django-user /py && \
+    chown -R django-user /app_code
 
 # Switch to the 'django-user' to perform further operations
 USER django-user
@@ -36,8 +32,10 @@ USER django-user
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r /tmp/requirements.txt --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org && \
-    /py/bin/pip install flake8 && \
-    /py/bin/django-admin startproject app .
+    /py/bin/pip install flake8
+
+# Start the project inside the container using the 'django-admin' command
+RUN mkdir /app/app && /py/bin/django-admin startproject app /app/app
 
 # Clean up temporary files
 RUN rm -rf /tmp
