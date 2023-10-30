@@ -23,6 +23,9 @@ COPY ./app /app_code
 # Set the working directory to the application directory
 WORKDIR /app
 
+# Change the owner of the copied files
+RUN chown -R django-user /app
+
 # Expose port 8000 (adjust as needed)
 EXPOSE 8000
 

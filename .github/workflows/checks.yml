@@ -36,7 +36,6 @@ jobs:
 
       - name: Test
         run: |
-          docker-compose run --rm -v ${{ github.workspace }}:/app app sh -c "chown -R django-user /app && python -m pip install -r /app/requirements.txt"
           docker-compose run --rm app sh -c "python manage.py test"
 
       - name: Lint
