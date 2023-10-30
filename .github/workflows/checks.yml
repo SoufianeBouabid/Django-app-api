@@ -7,19 +7,37 @@ jobs:
   test-lint:
     name: Test and Lint
     runs-on: ubuntu-20.04
+
+    services:
+      docker:
+        image: docker:stable-dind
+        options: --privileged
+
     steps:
       - name: Check Secrets Accessibility
         run: |
           echo "DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER }}"
           echo "DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN }}"
+
       - name: Login to docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{secrets.DOCKERHUB_USER }}
           password: ${{secrets.DOCKERHUB_TOKEN }}
+
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build the images
+        run: docker-compose build
+
       - name: Test
-        run: docker-compose run --rm app sh -c "python manage.py test"
+        run: |
+          docker-compose run --rm app sh -c "python -m pip install -r /path/to/requirements.txt"
+          docker-compose run --rm app sh -c "python manage.py test"
+
       - name: Lint
         run: docker-compose run --rm app sh -c "flake8"
