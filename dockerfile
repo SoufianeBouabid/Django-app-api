@@ -4,8 +4,7 @@ FROM python:3.9-alpine3.13
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
 
-# Switch to root user for system-level operations
-USER root
+
 
 # Install necessary packages, including CA certificates
 RUN apk update && \
